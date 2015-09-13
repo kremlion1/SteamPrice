@@ -181,7 +181,6 @@ namespace SteamPrice
                         {
                             foreach (Match match in matches)
                             {
-                                int i = 0;
                                 string currmatch = match.Groups[1].Value;
                                 string ItemGame = Regex.Match(html, "(?<=game_name\">)(.*)(?=</span>)").ToString();
                                 ItemGame = ItemGame.Replace(" Foil Trading Card", "");
