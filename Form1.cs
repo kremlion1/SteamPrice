@@ -292,6 +292,15 @@ namespace SteamPrice
             foreach (NewGame ng in games)
                 refreshPrices(ng);
         }
+
+        private void dataGridView1_ColumnHeaderMouseClick(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            games.Sort(delegate(NewGame x, NewGame y)
+            {
+                return String.Compare(x.name, y.name);
+            });
+            refreshGrid();
+        }
         
     }
 }

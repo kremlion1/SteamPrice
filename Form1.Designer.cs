@@ -33,6 +33,12 @@
             this.downloadButton = new System.Windows.Forms.Button();
             this.saveButton = new System.Windows.Forms.Button();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
+            this.nameDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.idDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.профит = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.profitWithPack = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.emoticonsGemsDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.newGameBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.button3 = new System.Windows.Forms.Button();
             this.button4 = new System.Windows.Forms.Button();
             this.button5 = new System.Windows.Forms.Button();
@@ -45,12 +51,6 @@
             this.button10 = new System.Windows.Forms.Button();
             this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.button11 = new System.Windows.Forms.Button();
-            this.newGameBindingSource = new System.Windows.Forms.BindingSource(this.components);
-            this.nameDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.idDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.профит = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.profitWithPack = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.emoticonsGemsDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.newGameBindingSource)).BeginInit();
             this.SuspendLayout();
@@ -65,10 +65,10 @@
             this.button7.UseVisualStyleBackColor = true;
             this.button7.Click += new System.EventHandler(this.button7_Click);
             // 
-            // button1
+            // downloadButton
             // 
             this.downloadButton.Location = new System.Drawing.Point(13, 74);
-            this.downloadButton.Name = "button1";
+            this.downloadButton.Name = "downloadButton";
             this.downloadButton.Size = new System.Drawing.Size(75, 23);
             this.downloadButton.TabIndex = 8;
             this.downloadButton.Text = "Загрузить";
@@ -104,6 +104,48 @@
             this.dataGridView1.Size = new System.Drawing.Size(544, 487);
             this.dataGridView1.TabIndex = 10;
             this.dataGridView1.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellDoubleClick);
+            this.dataGridView1.ColumnHeaderMouseClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dataGridView1_ColumnHeaderMouseClick);
+            // 
+            // nameDataGridViewTextBoxColumn
+            // 
+            this.nameDataGridViewTextBoxColumn.DataPropertyName = "name";
+            this.nameDataGridViewTextBoxColumn.HeaderText = "Название";
+            this.nameDataGridViewTextBoxColumn.Name = "nameDataGridViewTextBoxColumn";
+            this.nameDataGridViewTextBoxColumn.Width = 82;
+            // 
+            // idDataGridViewTextBoxColumn
+            // 
+            this.idDataGridViewTextBoxColumn.DataPropertyName = "id";
+            this.idDataGridViewTextBoxColumn.HeaderText = "id";
+            this.idDataGridViewTextBoxColumn.Name = "idDataGridViewTextBoxColumn";
+            this.idDataGridViewTextBoxColumn.Width = 40;
+            // 
+            // профит
+            // 
+            this.профит.DataPropertyName = "profitString";
+            this.профит.HeaderText = "Профит";
+            this.профит.Name = "профит";
+            this.профит.ReadOnly = true;
+            this.профит.Width = 71;
+            // 
+            // profitWithPack
+            // 
+            this.profitWithPack.DataPropertyName = "referenceWithPack";
+            this.profitWithPack.HeaderText = "Пак/карты";
+            this.profitWithPack.Name = "profitWithPack";
+            this.profitWithPack.ReadOnly = true;
+            this.profitWithPack.Width = 88;
+            // 
+            // emoticonsGemsDataGridViewTextBoxColumn
+            // 
+            this.emoticonsGemsDataGridViewTextBoxColumn.DataPropertyName = "emoticonsGems";
+            this.emoticonsGemsDataGridViewTextBoxColumn.HeaderText = "emoticonsGems";
+            this.emoticonsGemsDataGridViewTextBoxColumn.Name = "emoticonsGemsDataGridViewTextBoxColumn";
+            this.emoticonsGemsDataGridViewTextBoxColumn.Width = 107;
+            // 
+            // newGameBindingSource
+            // 
+            this.newGameBindingSource.DataSource = typeof(SteamPrice.NewGame);
             // 
             // button3
             // 
@@ -217,47 +259,6 @@
             this.button11.Text = "Обновить все";
             this.button11.UseVisualStyleBackColor = true;
             this.button11.Click += new System.EventHandler(this.button11_Click);
-            // 
-            // newGameBindingSource
-            // 
-            this.newGameBindingSource.DataSource = typeof(SteamPrice.NewGame);
-            // 
-            // nameDataGridViewTextBoxColumn
-            // 
-            this.nameDataGridViewTextBoxColumn.DataPropertyName = "name";
-            this.nameDataGridViewTextBoxColumn.HeaderText = "Название";
-            this.nameDataGridViewTextBoxColumn.Name = "nameDataGridViewTextBoxColumn";
-            this.nameDataGridViewTextBoxColumn.Width = 82;
-            // 
-            // idDataGridViewTextBoxColumn
-            // 
-            this.idDataGridViewTextBoxColumn.DataPropertyName = "id";
-            this.idDataGridViewTextBoxColumn.HeaderText = "id";
-            this.idDataGridViewTextBoxColumn.Name = "idDataGridViewTextBoxColumn";
-            this.idDataGridViewTextBoxColumn.Width = 40;
-            // 
-            // профит
-            // 
-            this.профит.DataPropertyName = "profitString";
-            this.профит.HeaderText = "Профит";
-            this.профит.Name = "профит";
-            this.профит.ReadOnly = true;
-            this.профит.Width = 71;
-            // 
-            // profitWithPack
-            // 
-            this.profitWithPack.DataPropertyName = "referenceWithPack";
-            this.profitWithPack.HeaderText = "Пак/карты";
-            this.profitWithPack.Name = "profitWithPack";
-            this.profitWithPack.ReadOnly = true;
-            this.profitWithPack.Width = 88;
-            // 
-            // emoticonsGemsDataGridViewTextBoxColumn
-            // 
-            this.emoticonsGemsDataGridViewTextBoxColumn.DataPropertyName = "emoticonsGems";
-            this.emoticonsGemsDataGridViewTextBoxColumn.HeaderText = "emoticonsGems";
-            this.emoticonsGemsDataGridViewTextBoxColumn.Name = "emoticonsGemsDataGridViewTextBoxColumn";
-            this.emoticonsGemsDataGridViewTextBoxColumn.Width = 107;
             // 
             // Form1
             // 
