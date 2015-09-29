@@ -288,6 +288,8 @@ namespace SteamPrice
                     {
                         string currmatch = match.Groups[1].Value;
                         GameCard gc = new GameCard(currmatch,this);
+                        if (gc.game == null)
+                            break;
                         gc.foil = gc.name.Contains("Foil");
                         this.cards.Add(gc);
                     }

@@ -152,31 +152,23 @@ namespace SteamPrice
             
             StreamReader response = new StreamReader(flixresponse.GetResponseStream(), Encoding.UTF8);
             string html = response.ReadToEnd();
-            html = html.Remove(0, html.IndexOf("<tbody>") + 7);
+            html = html.Remove(0,html.IndexOf("<tbody>") + 7);
             html = html.Remove(html.IndexOf("</tbody>"), html.Length - html.IndexOf("</tbody>"));
 
-            MatchCollection matches = Regex.Matches(html, "gamepage-appid-\\d+\">.+?</a", RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline);
+            MatchCollection matches = Regex.Matches(html, "(?<=<tr>)(.*?)(?<=</tr>)", RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline);
             if (matches.Count != 0)
             {
                 foreach (Match match in matches)
                 {
-<<<<<<< HEAD
-                    string currmatch = match.Groups[1].Value;
-                    string gameId = Regex.Match(currmatch, "(?<=appid-)(.*)(?=\">)").ToString();
-                    currmatch = currmatch.Remove(0, currmatch.IndexOf("appid-"));
-                    string gameName = Regex.Match(currmatch, "(?<=\">)(.*)(?=</a>)").ToString();
-=======
                     string currmatch = match.Groups[0].Value;
+                    
+                    string gameId = Regex.Match(currmatch, "(?<=appid-)(.*?)(?=\\\">)").ToString();
+                    currmatch = currmatch.Remove(0, currmatch.IndexOf("appid"));
+                    string gameName = Regex.Match(currmatch, "(?<=\">)(.*)(?=</a>)").ToString();
+
+                    currmatch = match.Groups[0].Value;
                     string ItemGame = currmatch.Substring(currmatch.IndexOf(">")+1);
                     ItemGame = ItemGame.Remove(ItemGame.IndexOf("</a"));
->>>>>>> origin/master
-                    /*string url = Regex.Match(html, "(?<==\")(.*)(?=\" id)").ToString();
-                    string volume = Regex.Match(html, "(?<=num_listings_qty\">)(.*)(?=</span>)").ToString();
-                    string ItemName = Regex.Match(html, "(?<=listing_item_name\" style=\"color:)(.*)(?=</span>)").ToString();
-                    ItemName = ItemName.Remove(0, ItemName.IndexOf(">") + 1);
-                    string name = ItemName;
-                    string img_url = Regex.Match(html, "(?<=net/economy/image/)(.*)(/62fx62f)", RegexOptions.Singleline).ToString();*/
-                    
 
                     if (games.Find(x => x.name == gameName) == null)
                     {
