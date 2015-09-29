@@ -138,6 +138,46 @@ namespace SteamPrice
 
         private void button6_Click(object sender, EventArgs e)
         {
+            HttpWebRequest request = (System.Net.HttpWebRequest)System.Net.HttpWebRequest.Create("http://www.steamcardexchange.net/index.php?boosterprices");
+            request.AllowAutoRedirect = false;
+            //request.CookieContainer.Add(new Cookie("PHPSESSID", "tep5gkkt47qktdl8fsrh0rqeqqvbhs5j"));
+            HttpWebResponse flixresponse = (HttpWebResponse)request.GetResponse();            
+            request = (System.Net.HttpWebRequest)System.Net.HttpWebRequest.Create("http://www.steamcardexchange.net/index.php?boosterprices");
+            request.CookieContainer = new CookieContainer();
+            string value= flixresponse.Headers["Set-Cookie"].Remove(0,10);
+            value=value.Remove(value.IndexOf(";"),value.Length-value.IndexOf(";"));
+            Cookie cookie = new Cookie("PHPSESSID", value, "/", "localhost");
+            request.CookieContainer.Add(cookie);
+            flixresponse = (HttpWebResponse)request.GetResponse();
+            
+            StreamReader response = new StreamReader(flixresponse.GetResponseStream(), Encoding.UTF8);
+            string html = response.ReadToEnd();
+            html = html.Remove(0, html.IndexOf("<tbody>") + 7);
+            html = html.Remove(html.IndexOf("</tbody>"), html.Length - html.IndexOf("</tbody>"));
+
+            MatchCollection matches = Regex.Matches(html, "(?<=<tr>)(.*?)(?<=</tr>)", RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline);
+            if (matches.Count != 0)
+            {
+                foreach (Match match in matches)
+                {
+                    string currmatch = match.Groups[1].Value;
+                    string ItemGame = Regex.Match(html, "(?<=game_name\">)(.*)(?=</span>)").ToString();
+                    ItemGame = ItemGame.Replace(" Foil Trading Card", "");
+                    ItemGame = ItemGame.Replace(" Trading Card", "");
+                    /*string url = Regex.Match(html, "(?<==\")(.*)(?=\" id)").ToString();
+                    string volume = Regex.Match(html, "(?<=num_listings_qty\">)(.*)(?=</span>)").ToString();
+                    string ItemName = Regex.Match(html, "(?<=listing_item_name\" style=\"color:)(.*)(?=</span>)").ToString();
+                    ItemName = ItemName.Remove(0, ItemName.IndexOf(">") + 1);
+                    string name = ItemName;
+                    string img_url = Regex.Match(html, "(?<=net/economy/image/)(.*)(/62fx62f)", RegexOptions.Singleline).ToString();*/
+                    NewGame tmpNG = new NewGame();
+                    tmpNG.name = ItemGame;
+
+                    //tmpNG = games.Find(x => x.name == name);
+                }
+            }
+
+            /*
             HttpWebRequest request = (System.Net.HttpWebRequest)System.Net.HttpWebRequest.Create("http://steamcommunity.com/market/search/render/?query=Trading Card&start=0&count=1");
             HttpWebResponse flixresponse = (HttpWebResponse)request.GetResponse();
             StreamReader response = new StreamReader(flixresponse.GetResponseStream(), Encoding.UTF8);
@@ -152,6 +192,7 @@ namespace SteamPrice
                     GetGamesThreadable(page, tmpList);
                 }
             }
+             */
         }
         public int CompareGames(NewGame x, NewGame y) {
             if (profit(x) < profit(y))
@@ -267,6 +308,10 @@ namespace SteamPrice
         private void GetGames(int page,List<NewGame> ngList)
         {            
             int countPerPage = 100;
+            lock (locker)
+            {
+                Thread.Sleep(5000);
+            }
 
 
             HttpWebRequest request = (System.Net.HttpWebRequest)System.Net.HttpWebRequest.Create("http://steamcommunity.com/market/search/render/?query=Trading Card&start=" + page * countPerPage + "&count=" + countPerPage);
