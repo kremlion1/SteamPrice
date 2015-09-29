@@ -155,15 +155,14 @@ namespace SteamPrice
             html = html.Remove(0, html.IndexOf("<tbody>") + 7);
             html = html.Remove(html.IndexOf("</tbody>"), html.Length - html.IndexOf("</tbody>"));
 
-            MatchCollection matches = Regex.Matches(html, "(?<=<tr>)(.*?)(?<=</tr>)", RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline);
+            MatchCollection matches = Regex.Matches(html, "gamepage-appid-\\d+\">.+?</a", RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline);
             if (matches.Count != 0)
             {
                 foreach (Match match in matches)
                 {
-                    string currmatch = match.Groups[1].Value;
-                    string ItemGame = Regex.Match(html, "(?<=game_name\">)(.*)(?=</span>)").ToString();
-                    ItemGame = ItemGame.Replace(" Foil Trading Card", "");
-                    ItemGame = ItemGame.Replace(" Trading Card", "");
+                    string currmatch = match.Groups[0].Value;
+                    string ItemGame = currmatch.Substring(currmatch.IndexOf(">")+1);
+                    ItemGame = ItemGame.Remove(ItemGame.IndexOf("</a"));
                     /*string url = Regex.Match(html, "(?<==\")(.*)(?=\" id)").ToString();
                     string volume = Regex.Match(html, "(?<=num_listings_qty\">)(.*)(?=</span>)").ToString();
                     string ItemName = Regex.Match(html, "(?<=listing_item_name\" style=\"color:)(.*)(?=</span>)").ToString();
