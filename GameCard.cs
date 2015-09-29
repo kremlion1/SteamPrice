@@ -279,7 +279,7 @@ namespace SteamPrice
 
             if (searchJS.Success)
             {
-                this.cards.Clear();
+                this.cards = new List<GameCard>();
 
                 MatchCollection matches = Regex.Matches(searchJS.HtmlRes, "(?<=market_listing_row_link\" href)(.*?)(?<=</a>)", RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline);
                 if (matches.Count != 0)

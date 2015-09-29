@@ -161,19 +161,32 @@ namespace SteamPrice
                 foreach (Match match in matches)
                 {
                     string currmatch = match.Groups[1].Value;
-                    string ItemGame = Regex.Match(html, "(?<=game_name\">)(.*)(?=</span>)").ToString();
-                    ItemGame = ItemGame.Replace(" Foil Trading Card", "");
-                    ItemGame = ItemGame.Replace(" Trading Card", "");
+                    string gameId = Regex.Match(currmatch, "(?<=appid-)(.*)(?=\">)").ToString();
+                    currmatch = currmatch.Remove(0, currmatch.IndexOf("appid-"));
+                    string gameName = Regex.Match(currmatch, "(?<=\">)(.*)(?=</a>)").ToString();
                     /*string url = Regex.Match(html, "(?<==\")(.*)(?=\" id)").ToString();
                     string volume = Regex.Match(html, "(?<=num_listings_qty\">)(.*)(?=</span>)").ToString();
                     string ItemName = Regex.Match(html, "(?<=listing_item_name\" style=\"color:)(.*)(?=</span>)").ToString();
                     ItemName = ItemName.Remove(0, ItemName.IndexOf(">") + 1);
                     string name = ItemName;
                     string img_url = Regex.Match(html, "(?<=net/economy/image/)(.*)(/62fx62f)", RegexOptions.Singleline).ToString();*/
-                    NewGame tmpNG = new NewGame();
-                    tmpNG.name = ItemGame;
+                    
 
-                    //tmpNG = games.Find(x => x.name == name);
+                    if (games.Find(x => x.name == gameName) == null)
+                    {
+                        NewGame tmpNG = new NewGame();
+                        tmpNG.name = gameName;
+                        tmpNG.id = gameId;
+
+                        //карты в руки
+                        request = (System.Net.HttpWebRequest)System.Net.HttpWebRequest.Create("http://steamcommunity.com/market/search/render/?query=" + gameName + " Trading Card&start=0&count=200");
+                        flixresponse = (HttpWebResponse)request.GetResponse();
+                        response = new StreamReader(flixresponse.GetResponseStream(), Encoding.UTF8);
+                        tmpNG.GetCards(response.ReadToEnd());
+
+                        //обновили карты
+                        refreshPrices(tmpNG);
+                    }
                 }
             }
 
