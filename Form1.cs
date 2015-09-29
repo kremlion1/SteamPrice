@@ -12,6 +12,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Runtime.Serialization.Json;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 //using System.Threading;
 //using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -20,17 +21,18 @@ namespace SteamPrice
 {    
     public partial class Form1 : Form
     {
+        static object locker = new object();
         int page = 1;
         int rowsPerPage = 20;
-        double price80 = 2.0;
+        double price80 = 2.0;        
         List<NewGame> games = new List<NewGame>();
         public Form1()
         {
             InitializeComponent();
             progressBar1.Minimum = 0;            
             progressBar1.Value = 1;
-            progressBar1.Step = 1;            
-
+            progressBar1.Step = 1;
+            
             refresh_80_price();
 
         }        
@@ -38,29 +40,7 @@ namespace SteamPrice
 
         private void button7_Click(object sender, EventArgs e)
         {
-           
-            foreach (NewGame g in games)
-            {
-                int kol = 0;
-                double summ = 0;
-                double price80=2.8;
-                string volume="";
-                foreach (GameCard gc in g.cards)
-                {
-                    if (gc.game.id == g.id & (gc.name.IndexOf("foil") == -1) & (gc.name.IndexOf("Foil") == -1))
-                    {
-                        kol++;
-                        if (gc != null )
-                        {
-                            if (gc.LowestPrice != null)
-                                summ += Convert.ToDouble(gc.LowestPrice.Remove(gc.LowestPrice.IndexOf(" ")));
-                            volume += gc.volume + " ";
-                        }
-                    }
-                }
-                //if ((((summ * 3 / kol) / 1.15) - 6000 / kol / 80 * price80) > 0)
-                    //richTextBox1.Text += g.name + " " + volume + "выгода" + String.Format("{0:F2}", (((summ * 3 / kol) / 1.15) - 6000 / kol / 80 * price80)) + "\r";
-            }
+            
         }
 
 
@@ -127,7 +107,8 @@ namespace SteamPrice
                     }
                 }
             }
-            return kol == 0 ? 0 : (((summ * 3 / kol) / 1.15) - 6000 / kol / 80 * price80);
+            double genCardsProfit = kol == 0 ? 0 : ((summ * 3 / kol) / 1.15);
+            return kol == 0 ? 0 : ((genCardsProfit > Convert.ToDouble(game.gamePack.LowestPrice) ? genCardsProfit : Convert.ToDouble(game.gamePack.LowestPrice)) - 6000 / kol / 80 * price80);
         }
 
         public void refreshGrid(){
@@ -162,42 +143,13 @@ namespace SteamPrice
             StreamReader response = new StreamReader(flixresponse.GetResponseStream(), Encoding.UTF8);
             string html = response.ReadToEnd();
             var searchJS = JsonConvert.DeserializeObject<SearchBody>(html);
-            List<NewGame> tmpList = new List<NewGame>();
+            List<NewGame> tmpList = new List<NewGame>();              
             if (searchJS.Success) {
                 int count = Convert.ToInt32(searchJS.TotalCount);                
                 int countPerPage = 100;
                 for (int page = 0; page < count / countPerPage; page++)
                 {
-                    request = (System.Net.HttpWebRequest)System.Net.HttpWebRequest.Create("http://steamcommunity.com/market/search/render/?query=Trading Card&start=" + page * countPerPage + "&count=" + countPerPage);
-                    flixresponse = (HttpWebResponse)request.GetResponse();
-                    response = new StreamReader(flixresponse.GetResponseStream(), Encoding.UTF8);
-                    html = response.ReadToEnd();
-                    searchJS = JsonConvert.DeserializeObject<SearchBody>(html);
-                    int kol = 0;
-                    if (searchJS.Success)
-                    {
-                        MatchCollection matches = Regex.Matches(searchJS.HtmlRes, "(?<=market_listing_row_link\" href)(.*?)(?<=</a>)", RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline);
-                        if (matches.Count != 0)
-                        {
-                            foreach (Match match in matches)
-                            {
-                                string currmatch = match.Groups[1].Value;
-                                string ItemGame = Regex.Match(html, "(?<=game_name\">)(.*)(?=</span>)").ToString();
-                                ItemGame = ItemGame.Replace(" Foil Trading Card", "");
-                                ItemGame = ItemGame.Replace(" Trading Card", "");
-                                /*string url = Regex.Match(html, "(?<==\")(.*)(?=\" id)").ToString();
-                                string volume = Regex.Match(html, "(?<=num_listings_qty\">)(.*)(?=</span>)").ToString();
-                                string ItemName = Regex.Match(html, "(?<=listing_item_name\" style=\"color:)(.*)(?=</span>)").ToString();
-                                ItemName = ItemName.Remove(0, ItemName.IndexOf(">") + 1);
-                                string name = ItemName;
-                                string img_url = Regex.Match(html, "(?<=net/economy/image/)(.*)(/62fx62f)", RegexOptions.Singleline).ToString();*/
-                                NewGame tmpNG = new NewGame();
-                                tmpNG.name = ItemGame;
-                                tmpList.Add(tmpNG);
-                                //NewGame tmpNG = games.Find(x => x.name == name);
-                            }
-                        }
-                    }
+                    GetGamesThreadable(page, tmpList);
                 }
             }
         }
@@ -301,6 +253,57 @@ namespace SteamPrice
             });
             refreshGrid();
         }
+
+        public void GetGamesThreadable(int page,List<NewGame> ngList)
+        {
+            Thread thread;
+
+            thread = new Thread(delegate() { GetGames(page, ngList); });
+            
+            thread.Name = "get games page " + page;
+            thread.Start();
+        }
+
+        private void GetGames(int page,List<NewGame> ngList)
+        {            
+            int countPerPage = 100;
+
+
+            HttpWebRequest request = (System.Net.HttpWebRequest)System.Net.HttpWebRequest.Create("http://steamcommunity.com/market/search/render/?query=Trading Card&start=" + page * countPerPage + "&count=" + countPerPage);
+            HttpWebResponse flixresponse = (HttpWebResponse)request.GetResponse();
+            StreamReader response = new StreamReader(flixresponse.GetResponseStream(), Encoding.UTF8);
+            string html = response.ReadToEnd();
+            var searchJS = JsonConvert.DeserializeObject<SearchBody>(html);
+                    int kol = 0;
+                    if (searchJS.Success)
+                    {
+                        MatchCollection matches = Regex.Matches(searchJS.HtmlRes, "(?<=market_listing_row_link\" href)(.*?)(?<=</a>)", RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline);
+                        if (matches.Count != 0)
+                        {
+                            foreach (Match match in matches)
+                            {
+                                string currmatch = match.Groups[1].Value;
+                                string ItemGame = Regex.Match(html, "(?<=game_name\">)(.*)(?=</span>)").ToString();
+                                ItemGame = ItemGame.Replace(" Foil Trading Card", "");
+                                ItemGame = ItemGame.Replace(" Trading Card", "");
+                                /*string url = Regex.Match(html, "(?<==\")(.*)(?=\" id)").ToString();
+                                string volume = Regex.Match(html, "(?<=num_listings_qty\">)(.*)(?=</span>)").ToString();
+                                string ItemName = Regex.Match(html, "(?<=listing_item_name\" style=\"color:)(.*)(?=</span>)").ToString();
+                                ItemName = ItemName.Remove(0, ItemName.IndexOf(">") + 1);
+                                string name = ItemName;
+                                string img_url = Regex.Match(html, "(?<=net/economy/image/)(.*)(/62fx62f)", RegexOptions.Singleline).ToString();*/
+                                NewGame tmpNG = new NewGame();
+                                tmpNG.name = ItemGame;
+                                lock (locker)
+                                {
+                                    ngList.Add(tmpNG);
+                                }
+                                //NewGame tmpNG = games.Find(x => x.name == name);
+                            }
+                        }
+                    }
+        }
+
         
     }
 }

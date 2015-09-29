@@ -102,6 +102,7 @@ namespace SteamPrice
         {
             if(dataGridView1.SelectedRows.Count!=0)
             {
+
                 GameCard gc = dataGridView1.SelectedRows[0].DataBoundItem as GameCard;
                 game.cards.Remove(gc);
                 gcList = new List<GameCard>(game.cards);
