@@ -89,6 +89,28 @@ namespace SteamPrice
                 return -1;
             });            
             refreshGrid();
+            
+            /*newGameBindingSource.DataSource = games.FindAll(x => x.cards.FindAll(c=>c.updated>DateTime.Today).Count>0);
+            //newGameBindingSource.DataSource = games.FindAll(x => x.name.IndexOf(textBox1.Text, StringComparison.OrdinalIgnoreCase) != -1).Take(200);
+            if (dataGridView1.Rows[0].Cells[0].Value != null)
+                foreach (DataGridViewRow dgr in dataGridView1.Rows)
+                {
+                    double volume = 0;
+                    int kol = 0;
+                    foreach (GameCard gc in ((NewGame)dgr.DataBoundItem).cards.FindAll(x => !x.foil))
+                    {
+                        kol++;
+                        if (gc != null)
+                            volume += gc.volume == null ? 0 : Convert.ToDouble(gc.volume);
+                    }
+                    if (kol > 0)
+                    {
+                        int red = Convert.ToInt32(((volume / kol) * 50 > 255 ? 0 : 255 - (volume / kol) * 50));
+                        int green = Convert.ToInt32(((volume / kol) * 50 > 255 ? 255 : (volume / kol) * 50));
+                        dgr.DefaultCellStyle.BackColor = Color.FromArgb(red, green, 0);
+                    }
+                }
+            dataGridView1.Refresh();*/
         }
         public double profit(NewGame game) {
             int kol = 0;
@@ -177,13 +199,16 @@ namespace SteamPrice
                         tmpNG.id = gameId;
 
                         //карты в руки
-                        request = (System.Net.HttpWebRequest)System.Net.HttpWebRequest.Create("http://steamcommunity.com/market/search/render/?query=" + gameName + " Trading Card&start=0&count=200");
-                        flixresponse = (HttpWebResponse)request.GetResponse();
-                        response = new StreamReader(flixresponse.GetResponseStream(), Encoding.UTF8);
-                        tmpNG.GetCards(response.ReadToEnd());
+                        string responseHtml = Requests.GetHttpResponse("http://steamcommunity.com/market/search/render/?query=" + gameName + " Trading Card&start=0&count=200");
+                        if (responseHtml == null)
+                            break;
+                        tmpNG.GetCards(responseHtml);
 
                         //обновили карты
                         refreshPrices(tmpNG);
+
+                        //схоронили игоря
+                        games.Add(tmpNG);
                     }
                 }
             }

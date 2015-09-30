@@ -12,6 +12,20 @@ using System.Text.RegularExpressions;
 
 namespace SteamPrice
 {
+    public class Requests {
+        public static string GetHttpResponse(string url) {
+            try
+            {
+                HttpWebRequest request = (System.Net.HttpWebRequest)System.Net.HttpWebRequest.Create(url);
+                HttpWebResponse flixresponse = (HttpWebResponse)request.GetResponse();
+                StreamReader response = new StreamReader(flixresponse.GetResponseStream(), Encoding.UTF8);
+                return response.ReadToEnd();
+            }
+            catch(Exception e){
+                return null;
+            }
+        }
+    }
 
     public class SearchBody
     {
@@ -41,30 +55,7 @@ namespace SteamPrice
         [DataMemberAttribute]
         public string updated { get; set; }
     }
-    [DataContractAttribute]
-    class GameResponse
-    {
-        [DataMemberAttribute]
-        public string appid { get; set; }
-        [DataMemberAttribute]
-        public string name { get; set; }
-        [DataMemberAttribute]
-        public Response[] cards { get; set; }
-    }    
-    [DataContractAttribute, Serializable]
-    public class GameCardData
-    {
-        [DataMemberAttribute]
-        public bool success { get; set; }
-        [DataMemberAttribute]
-        public string lowest_price { get; set; }
-        [DataMemberAttribute]
-        public string volume { get; set; }
-        [DataMemberAttribute]
-        public string median_price { get; set; }
-        
-    }
-
+    
     [DataContractAttribute, Serializable]
     public class GameEntity
     {
@@ -186,6 +177,7 @@ namespace SteamPrice
                 ItemName = ItemName.Remove(0, ItemName.IndexOf(">") + 1);
                 this.name = ItemName;
                 this.img_url = Regex.Match(html, "(?<=net/economy/image/)(.*)(/62fx62f)", RegexOptions.Singleline).ToString();
+                this.updated = DateTime.Now;
 
             }
         }
