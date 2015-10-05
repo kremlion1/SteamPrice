@@ -382,7 +382,10 @@ namespace SteamPrice
                         //карты в руки
                         string responseHtml = Requests.GetHttpResponse("http://steamcommunity.com/market/search/render/?query=" + gameName + " Trading Card&start=0&count=200");
                         if (responseHtml == null)
+                        {
+                            refreshGrid();
                             break;
+                        }
                         tmpNG.GetCards(responseHtml);
 
                         //обновили карты
