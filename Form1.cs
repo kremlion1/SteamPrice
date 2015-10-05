@@ -137,6 +137,7 @@ namespace SteamPrice
             //List<NewGame> sdf = games.FindAll(x => x.id!= null).FindAll(x=>x.id.IndexOf("320760")!=-1);
             newGameBindingSource.DataSource = games.FindAll(x => x.favorite == checkBox1.Checked).FindAll(x => x.name.IndexOf(textBox1.Text, StringComparison.OrdinalIgnoreCase) != -1).Skip((page - 1) * rowsPerPage).Take(rowsPerPage);
             //newGameBindingSource.DataSource = games.FindAll(x => x.name.IndexOf(textBox1.Text, StringComparison.OrdinalIgnoreCase) != -1).Take(200);
+            double gems = 0;
             if (dataGridView1.Rows[0].Cells[0].Value!=null)
                 foreach (DataGridViewRow dgr in dataGridView1.Rows)
                 {
@@ -153,8 +154,10 @@ namespace SteamPrice
                         int red = Convert.ToInt32(((volume / kol) * 50 > 255 ? 0 : 255 - (volume / kol) * 50));
                         int green = Convert.ToInt32(((volume / kol) * 50 > 255 ? 255 : (volume / kol) * 50));
                         dgr.DefaultCellStyle.BackColor = Color.FromArgb(red, green, 0);
+                        gems += 6000 / kol;
                     }
                 }
+            label2.Text = games.Count.ToString()+"/"+gems.ToString("N");
             dataGridView1.Refresh();
         }
 
