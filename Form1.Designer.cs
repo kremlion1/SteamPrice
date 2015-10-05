@@ -33,12 +33,8 @@
             this.downloadButton = new System.Windows.Forms.Button();
             this.saveButton = new System.Windows.Forms.Button();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
-            this.nameDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.idDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.профит = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.profitWithPack = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.emoticonsGemsDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.newGameBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.button3 = new System.Windows.Forms.Button();
             this.button4 = new System.Windows.Forms.Button();
             this.button5 = new System.Windows.Forms.Button();
@@ -53,6 +49,11 @@
             this.button11 = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
+            this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.nameDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.idDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.emoticonsGemsDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.newGameBindingSource = new System.Windows.Forms.BindingSource(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.newGameBindingSource)).BeginInit();
             this.SuspendLayout();
@@ -108,20 +109,6 @@
             this.dataGridView1.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellDoubleClick);
             this.dataGridView1.ColumnHeaderMouseClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dataGridView1_ColumnHeaderMouseClick);
             // 
-            // nameDataGridViewTextBoxColumn
-            // 
-            this.nameDataGridViewTextBoxColumn.DataPropertyName = "name";
-            this.nameDataGridViewTextBoxColumn.HeaderText = "Название";
-            this.nameDataGridViewTextBoxColumn.Name = "nameDataGridViewTextBoxColumn";
-            this.nameDataGridViewTextBoxColumn.Width = 82;
-            // 
-            // idDataGridViewTextBoxColumn
-            // 
-            this.idDataGridViewTextBoxColumn.DataPropertyName = "id";
-            this.idDataGridViewTextBoxColumn.HeaderText = "id";
-            this.idDataGridViewTextBoxColumn.Name = "idDataGridViewTextBoxColumn";
-            this.idDataGridViewTextBoxColumn.Width = 40;
-            // 
             // профит
             // 
             this.профит.DataPropertyName = "profitString";
@@ -137,17 +124,6 @@
             this.profitWithPack.Name = "profitWithPack";
             this.profitWithPack.ReadOnly = true;
             this.profitWithPack.Width = 88;
-            // 
-            // emoticonsGemsDataGridViewTextBoxColumn
-            // 
-            this.emoticonsGemsDataGridViewTextBoxColumn.DataPropertyName = "emoticonsGems";
-            this.emoticonsGemsDataGridViewTextBoxColumn.HeaderText = "emoticonsGems";
-            this.emoticonsGemsDataGridViewTextBoxColumn.Name = "emoticonsGemsDataGridViewTextBoxColumn";
-            this.emoticonsGemsDataGridViewTextBoxColumn.Width = 107;
-            // 
-            // newGameBindingSource
-            // 
-            this.newGameBindingSource.DataSource = typeof(SteamPrice.NewGame);
             // 
             // button3
             // 
@@ -280,6 +256,36 @@
             this.label2.TabIndex = 24;
             this.label2.Text = "label2";
             // 
+            // timer1
+            // 
+            this.timer1.Interval = 600000;
+            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            // 
+            // nameDataGridViewTextBoxColumn
+            // 
+            this.nameDataGridViewTextBoxColumn.DataPropertyName = "name";
+            this.nameDataGridViewTextBoxColumn.HeaderText = "Название";
+            this.nameDataGridViewTextBoxColumn.Name = "nameDataGridViewTextBoxColumn";
+            this.nameDataGridViewTextBoxColumn.Width = 82;
+            // 
+            // idDataGridViewTextBoxColumn
+            // 
+            this.idDataGridViewTextBoxColumn.DataPropertyName = "id";
+            this.idDataGridViewTextBoxColumn.HeaderText = "id";
+            this.idDataGridViewTextBoxColumn.Name = "idDataGridViewTextBoxColumn";
+            this.idDataGridViewTextBoxColumn.Width = 40;
+            // 
+            // emoticonsGemsDataGridViewTextBoxColumn
+            // 
+            this.emoticonsGemsDataGridViewTextBoxColumn.DataPropertyName = "emoticonsGems";
+            this.emoticonsGemsDataGridViewTextBoxColumn.HeaderText = "emoticonsGems";
+            this.emoticonsGemsDataGridViewTextBoxColumn.Name = "emoticonsGemsDataGridViewTextBoxColumn";
+            this.emoticonsGemsDataGridViewTextBoxColumn.Width = 107;
+            // 
+            // newGameBindingSource
+            // 
+            this.newGameBindingSource.DataSource = typeof(SteamPrice.NewGame);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -337,7 +343,8 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn profitWithPack;
         private System.Windows.Forms.DataGridViewTextBoxColumn emoticonsGemsDataGridViewTextBoxColumn;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Label label2;        
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Timer timer1;        
     }
 }
 

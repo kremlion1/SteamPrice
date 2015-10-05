@@ -35,6 +35,8 @@ namespace SteamPrice
             
             refresh_80_price();
 
+            timer1.Enabled = true;
+
         }        
 
 
@@ -163,58 +165,7 @@ namespace SteamPrice
 
         private void button6_Click(object sender, EventArgs e)
         {
-            HttpWebRequest request = (System.Net.HttpWebRequest)System.Net.HttpWebRequest.Create("http://www.steamcardexchange.net/index.php?boosterprices");
-            request.AllowAutoRedirect = false;
-            //request.CookieContainer.Add(new Cookie("PHPSESSID", "tep5gkkt47qktdl8fsrh0rqeqqvbhs5j"));
-            HttpWebResponse flixresponse = (HttpWebResponse)request.GetResponse();            
-            request = (System.Net.HttpWebRequest)System.Net.HttpWebRequest.Create("http://www.steamcardexchange.net/index.php?boosterprices");
-            request.CookieContainer = new CookieContainer();
-            string value= flixresponse.Headers["Set-Cookie"].Remove(0,10);
-            value=value.Remove(value.IndexOf(";"),value.Length-value.IndexOf(";"));
-            Cookie cookie = new Cookie("PHPSESSID", value, "/", "localhost");
-            request.CookieContainer.Add(cookie);
-            flixresponse = (HttpWebResponse)request.GetResponse();
-            
-            StreamReader response = new StreamReader(flixresponse.GetResponseStream(), Encoding.UTF8);
-            string html = response.ReadToEnd();
-            html = html.Remove(0,html.IndexOf("<tbody>") + 7);
-            html = html.Remove(html.IndexOf("</tbody>"), html.Length - html.IndexOf("</tbody>"));
-
-            MatchCollection matches = Regex.Matches(html, "(?<=<tr>)(.*?)(?<=</tr>)", RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline);
-            if (matches.Count != 0)
-            {
-                foreach (Match match in matches)
-                {
-                    string currmatch = match.Groups[0].Value;
-                    
-                    string gameId = Regex.Match(currmatch, "(?<=appid-)(.*?)(?=\\\">)").ToString();
-                    currmatch = currmatch.Remove(0, currmatch.IndexOf("appid"));
-                    string gameName = Regex.Match(currmatch, "(?<=\">)(.*)(?=</a>)").ToString();
-
-                    currmatch = match.Groups[0].Value;
-                    string ItemGame = currmatch.Substring(currmatch.IndexOf(">")+1);
-                    ItemGame = ItemGame.Remove(ItemGame.IndexOf("</a"));
-
-                    if (games.Find(x => x.name == gameName) == null)
-                    {
-                        NewGame tmpNG = new NewGame();
-                        tmpNG.name = gameName;
-                        tmpNG.id = gameId;
-
-                        //карты в руки
-                        string responseHtml = Requests.GetHttpResponse("http://steamcommunity.com/market/search/render/?query=" + gameName + " Trading Card&start=0&count=200");
-                        if (responseHtml == null)
-                            break;
-                        tmpNG.GetCards(responseHtml);
-
-                        //обновили карты
-                        refreshPrices(tmpNG);
-
-                        //схоронили игоря
-                        games.Add(tmpNG);
-                    }
-                }
-            }
+          
 
             /*
             HttpWebRequest request = (System.Net.HttpWebRequest)System.Net.HttpWebRequest.Create("http://steamcommunity.com/market/search/render/?query=Trading Card&start=0&count=1");
@@ -386,6 +337,62 @@ namespace SteamPrice
                             }
                         }
                     }
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            HttpWebRequest request = (System.Net.HttpWebRequest)System.Net.HttpWebRequest.Create("http://www.steamcardexchange.net/index.php?boosterprices");
+            request.AllowAutoRedirect = false;
+            //request.CookieContainer.Add(new Cookie("PHPSESSID", "tep5gkkt47qktdl8fsrh0rqeqqvbhs5j"));
+            HttpWebResponse flixresponse = (HttpWebResponse)request.GetResponse();
+            request = (System.Net.HttpWebRequest)System.Net.HttpWebRequest.Create("http://www.steamcardexchange.net/index.php?boosterprices");
+            request.CookieContainer = new CookieContainer();
+            string value = flixresponse.Headers["Set-Cookie"].Remove(0, 10);
+            value = value.Remove(value.IndexOf(";"), value.Length - value.IndexOf(";"));
+            Cookie cookie = new Cookie("PHPSESSID", value, "/", "localhost");
+            request.CookieContainer.Add(cookie);
+            flixresponse = (HttpWebResponse)request.GetResponse();
+
+            StreamReader response = new StreamReader(flixresponse.GetResponseStream(), Encoding.UTF8);
+            string html = response.ReadToEnd();
+            html = html.Remove(0, html.IndexOf("<tbody>") + 7);
+            html = html.Remove(html.IndexOf("</tbody>"), html.Length - html.IndexOf("</tbody>"));
+
+            MatchCollection matches = Regex.Matches(html, "(?<=<tr>)(.*?)(?<=</tr>)", RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline);
+            if (matches.Count != 0)
+            {
+                foreach (Match match in matches)
+                {
+                    string currmatch = match.Groups[0].Value;
+
+                    string gameId = Regex.Match(currmatch, "(?<=appid-)(.*?)(?=\\\">)").ToString();
+                    currmatch = currmatch.Remove(0, currmatch.IndexOf("appid"));
+                    string gameName = Regex.Match(currmatch, "(?<=\">)(.*)(?=</a>)").ToString();
+
+                    currmatch = match.Groups[0].Value;
+                    string ItemGame = currmatch.Substring(currmatch.IndexOf(">") + 1);
+                    ItemGame = ItemGame.Remove(ItemGame.IndexOf("</a"));
+
+                    if (games.Find(x => x.name == gameName) == null)
+                    {
+                        NewGame tmpNG = new NewGame();
+                        tmpNG.name = gameName;
+                        tmpNG.id = gameId;
+
+                        //карты в руки
+                        string responseHtml = Requests.GetHttpResponse("http://steamcommunity.com/market/search/render/?query=" + gameName + " Trading Card&start=0&count=200");
+                        if (responseHtml == null)
+                            break;
+                        tmpNG.GetCards(responseHtml);
+
+                        //обновили карты
+                        refreshPrices(tmpNG);
+
+                        //схоронили игоря
+                        games.Add(tmpNG);
+                    }
+                }
+            }
         }
 
         
